@@ -1,4 +1,12 @@
 <template>
+    <div align="center">
+        <a href="/crear-producto" class="text-primary mx-2">Añadir producto</a>
+    </div>
+    <div class="col-12 text-center" v-if="alerta === true">
+        <div class="alert alert-danger" role="alert">
+            <p>No haz publicado ninguna imagen</p>
+        </div>
+    </div>
     <div v-for="p in productos" :key="p.id">
         <div class="card mb-3" style="max-width: 540px;">
             <div class="row no-gutters">
@@ -19,32 +27,33 @@
 
 <script>
 export default {
-    name: 'Home',
+    name: 'Productos',
     data(){
         return{
-            sesion: {},
+            alerta: false,
             productos: []
         }
     },
-    mounted() {
-        //location.reload();
-        //localStorage.removeItem('token');
-        //localStorage.removeItem('user')
-        //localStorage.setItem('token', "123cwd12");
-        //this.sesion = JSON.parse(localStorage.getItem('user'))
-        if((localStorage.getItem("token")) === null){
-            this.sesion = '';
-        }else{
-            this.sesion = localStorage.getItem('token');
-        };
-        this.getproductos()
+    mounted(){
+        this.misproductos()
     },
     methods: {
-        getproductos(){
-            fetch('http://localhost:1337/productos')
+        misproductos(){
+            const token = localStorage.getItem('token')
+            fetch('http://localhost:1337/producto/me', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
             .then(res => res.json())
             .then(data => {
                 this.productos = data
+                if(this.productos.length == 0)
+                {
+                    this.alerta = true
+                }else{
+                    this.alerta = false
+                }
             })
         },
     }
